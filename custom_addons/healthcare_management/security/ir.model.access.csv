@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_healthcare_patient,access_healthcare_patient,model_healthcare_patient,,1,1,1,1
+access_healthcare_appointment,access_healthcare_appointment,model_healthcare_appointment,,1,1,1,1
+access_healthcare_feedback,access_healthcare_feedback,model_healthcare_feedback,,1,1,1,1
+access_healthcare_complaint,access_healthcare_complaint,model_healthcare_complaint,,1,1,1,1

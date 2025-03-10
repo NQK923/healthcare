@@ -47,13 +47,13 @@
                             <page string="Danh mục kiểm tra" name="check_items">
                                 <field name="check_item_ids"
                                        attrs="{'readonly': [('state', 'not in', ['draft', 'in_progress'])]}">
-                                    <tree editable="bottom">
+                                    <list editable="bottom">
                                         <field name="sequence" widget="handle"/>
                                         <field name="name"/>
                                         <field name="description"/>
                                         <field name="is_compliant"/>
                                         <field name="notes"/>
-                                    </tree>
+                                    </list>
                                 </field>
                             </page>
                             <page string="Kết quả" name="results" attrs="{'invisible': [('state', '=', 'draft')]}">
@@ -63,12 +63,12 @@
                             <page string="Hành động khắc phục" name="corrective_actions"
                                   attrs="{'invisible': [('state', 'in', ['draft'])]}">
                                 <field name="corrective_action_ids" readonly="1">
-                                    <tree>
+                                    <list>
                                         <field name="name"/>
                                         <field name="responsible_user_id"/>
                                         <field name="deadline"/>
                                         <field name="state" widget="badge"/>
-                                    </tree>
+                                    </list>
                                 </field>
                             </page>
                         </notebook>
@@ -87,7 +87,7 @@
             <field name="name">compliance.check.tree</field>
             <field name="model">compliance.check</field>
             <field name="arch" type="xml">
-                <tree string="Kiểm tra tuân thủ" decoration-danger="state == 'non_compliant'" decoration-success="state == 'completed'" decoration-info="state == 'in_progress'" decoration-muted="state == 'draft'">
+                <list string="Kiểm tra tuân thủ" decoration-danger="state == 'non_compliant'" decoration-success="state == 'completed'" decoration-info="state == 'in_progress'" decoration-muted="state == 'draft'">
                     <field name="name"/>
                     <field name="regulation_id"/>
                     <field name="check_date"/>
@@ -96,7 +96,7 @@
                     <field name="result"/>
                     <field name="compliance_score" widget="percentage"/>
                     <field name="state" widget="badge"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -184,7 +184,7 @@
         <record id="action_compliance_check" model="ir.actions.act_window">
             <field name="name">Kiểm tra tuân thủ</field>
             <field name="res_model">compliance.check</field>
-            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_mode">kanban,list,form</field>
             <field name="view_id" ref="view_compliance_check_kanban"/>
             <field name="search_view_id" ref="view_compliance_check_search"/>
             <field name="help" type="html">

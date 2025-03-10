@@ -26,28 +26,28 @@
             <field name="name">Quy định Y tế: multi-company</field>
             <field name="model_id" ref="model_medical_regulation"/>
             <field name="global" eval="True"/>
-            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+<!--            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>-->
         </record>
 
         <record id="compliance_check_multi_company_rule" model="ir.rule">
             <field name="name">Kiểm tra tuân thủ: multi-company</field>
             <field name="model_id" ref="model_compliance_check"/>
             <field name="global" eval="True"/>
-            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+<!--            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>-->
         </record>
 
         <record id="corrective_action_multi_company_rule" model="ir.rule">
             <field name="name">Hành động khắc phục: multi-company</field>
             <field name="model_id" ref="model_corrective_action"/>
             <field name="global" eval="True"/>
-            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+<!--            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>-->
         </record>
 
         <record id="compliance_report_multi_company_rule" model="ir.rule">
             <field name="name">Báo cáo tuân thủ: multi-company</field>
             <field name="model_id" ref="model_compliance_report"/>
             <field name="global" eval="True"/>
-            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    <!--        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>-->
         </record>
     </data>
 </odoo>

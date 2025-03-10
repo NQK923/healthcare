@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="view_corrective_action_form" model="ir.ui.view">
+            <field name="name">corrective.action.form</field>
+            <field name="model">corrective.action</field>
+            <field name="arch" type="xml">
+                <form string="Hành động khắc phục">
+                    <header>
+                        <button name="action_start" string="Bắt đầu thực hiện" type="object" class="oe_highlight"
+                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <button name="action_complete" string="Hoàn thành" type="object" class="oe_highlight"
+                                attrs="{'invisible': [('state', '!=', 'in_progress')]}"/>
+                        <button name="action_verify" string="Xác minh" type="object" class="oe_highlight"
+                                attrs="{'invisible': [('state', '!=', 'completed')]}"/>
+                        <button name="action_reset" string="Đặt lại" type="object"
+                                attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,completed,verified"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Tên hành động khắc phục"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="compliance_check_id" readonly="1"/>
+                                <field name="regulation_id" readonly="1"/>
+                                <field name="responsible_user_id"/>
+                                <field name="department_id"/>
+                            </group>
+                            <group>
+                                <field name="start_date" readonly="1"/>
+                                <field name="deadline"/>
+                                <field name="completion_date" readonly="1" attrs="{'invisible': [('completion_date', '=', False)]}"/>
+                                <field name="verify_user_id" readonly="1" attrs="{'invisible': [('verify_user_id', '=', False)]}"/>
+                                <field name="verify_date" readonly="1" attrs="{'invisible': [('verify_date', '=', False)]}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Mô tả" name="description">
+                                <field name="description" placeholder="Mô tả chi tiết về hành động khắc phục..."/>
+                            </page>
+                            <page string="Kết quả" name="results" attrs="{'invisible': [('state', 'in', ['draft'])]}">
+                                <field name="result" placeholder="Mô tả kết quả thực hiện hành động khắc phục..."
+                                       attrs="{'readonly': [('state', 'not in', ['in_progress', 'completed'])]}"/>
+                            </page>
+                            <page string="Xác minh" name="verification" attrs="{'invisible': [('state', '!=', 'verified')]}">
+                                <field name="verify_note" placeholder="Ghi chú về việc xác minh kết quả..."/>
+                            </page>
+                            <page string="Tài liệu" name="documents">
+                                <field name="attachment_ids" widget="many2many_binary"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_corrective_action_tree" model="ir.ui.view">
+            <field name="name">corrective.action.tree</field>
+            <field name="model">corrective.action</field>
+            <field name="arch" type="xml">
+                <tree string="Hành động khắc phục" decoration-danger="deadline and deadline &lt; current_date and state != 'verified'" decoration-success="state == 'verified'" decoration-info="state == 'in_progress'" decoration-muted="state == 'draft'">
+                    <field name="name"/>
+                    <field name="compliance_check_id"/>
+                    <field name="regulation_id"/>
+                    <field name="responsible_user_id"/>
+                    <field name="deadline"/>
+                    <field name="completion_date"/>
+                    <field name="state" widget="badge"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_corrective_action_search" model="ir.ui.view">
+            <field name="name">corrective.action.search</field>
+            <field name="model">corrective.action</field>
+            <field name="arch" type="xml">
+                <search string="Tìm kiếm hành động khắc phục">
+                    <field name="name"/>
+                    <field name="compliance_check_id"/>
+                    <field name="regulation_id"/>
+                    <field name="responsible_user_id"/>
+                    <field name="department_id"/>
+                    <filter string="Dự thảo" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Đang thực hiện" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                    <filter string="Hoàn thành" name="completed" domain="[('state', '=', 'completed')]"/>
+                    <filter string="Đã xác minh" name="verified" domain="[('state', '=', 'verified')]"/>
+                    <separator/>
+                    <filter string="Quá hạn" name="overdue" domain="[('deadline', '&lt;', context_today().strftime('%Y-%m-%d')), ('state', 'not in', ['verified'])]"/>
+                    <filter string="Sắp đến hạn" name="due_today" domain="[('deadline', '=', context_today().strftime('%Y-%m-%d')), ('state', 'not in', ['verified'])]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_regulation" string="Quy định" context="{'group_by': 'regulation_id'}"/>
+                        <filter name="group_by_check" string="Đợt kiểm tra" context="{'group_by': 'compliance_check_id'}"/>
+                        <filter name="group_by_responsible" string="Người thực hiện" context="{'group_by': 'responsible_user_id'}"/>
+                        <filter name="group_by_department" string="Phòng ban" context="{'group_by': 'department_id'}"/>
+                        <filter name="group_by_deadline" string="Hạn hoàn thành" context="{'group_by': 'deadline'}"/>
+                        <filter name="group_by_state" string="Trạng thái" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_corrective_action" model="ir.actions.act_window">
+            <field name="name">Hành động khắc phục</field>
+            <field name="res_model">corrective.action</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_corrective_action_tree"/>
+            <field name="search_view_id" ref="view_corrective_action_search"/>
+            <field name="context">{'search_default_in_progress': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Tạo hành động khắc phục đầu tiên!
+                </p>
+                <p>
+                    Quản lý các hành động khắc phục để giải quyết các vấn đề không tuân thủ.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

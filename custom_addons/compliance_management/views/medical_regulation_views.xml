@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="view_medical_regulation_form" model="ir.ui.view">
+            <field name="name">medical.regulation.form</field>
+            <field name="model">medical.regulation</field>
+            <field name="arch" type="xml">
+                <form string="Quy định Y tế">
+                    <header>
+                        <field name="is_active" widget="boolean_toggle"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_compliance_checks" type="object" class="oe_stat_button" icon="fa-check-square-o">
+                                <field name="compliance_check_count" widget="statinfo" string="Kiểm tra"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Tên quy định"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="code"/>
+                                <field name="regulation_type"/>
+                                <field name="issuing_authority"/>
+                                <field name="responsible_department_id"/>
+                                <field name="responsible_user_id"/>
+                            </group>
+                            <group>
+                                <field name="issue_date"/>
+                                <field name="effective_date"/>
+                                <field name="expiry_date"/>
+                                <field name="document_url" widget="url"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Mô tả" name="description">
+                                <field name="description" placeholder="Mô tả chi tiết về quy định..."/>
+                            </page>
+                            <page string="Tiêu chí tuân thủ" name="criteria">
+                                <field name="compliance_criteria_ids">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="description"/>
+                                        </tree>
+                                </field>
+                            </page>
+                            <page string="Tài liệu đính kèm" name="attachments">
+                                <field name="attachment_ids" widget="many2many_binary"/>
+                            </page>
+                            <page string="Kiểm tra tuân thủ" name="compliance_checks">
+                                <field name="compliance_check_ids" readonly="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="check_date"/>
+                                        <field name="result"/>
+                                        <field name="compliance_score" widget="percentage"/>
+                                        <field name="state" widget="badge" decoration-success="state == 'completed'" decoration-danger="state == 'non_compliant'" decoration-info="state == 'in_progress'" decoration-muted="state == 'draft'"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_medical_regulation_tree" model="ir.ui.view">
+            <field name="name">medical.regulation.tree</field>
+            <field name="model">medical.regulation</field>
+            <field name="arch" type="xml">
+                <tree string="Quy định Y tế" decoration-muted="not is_active">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="regulation_type"/>
+                    <field name="issuing_authority"/>
+                    <field name="effective_date"/>
+                    <field name="expiry_date"/>
+                    <field name="is_active"/>
+                    <field name="responsible_user_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_medical_regulation_search" model="ir.ui.view">
+            <field name="name">medical.regulation.search</field>
+            <field name="model">medical.regulation</field>
+            <field name="arch" type="xml">
+                <search string="Tìm kiếm quy định">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="issuing_authority"/>
+                    <field name="responsible_user_id"/>
+                    <filter string="Còn hiệu lực" name="active" domain="[('is_active', '=', True)]"/>
+                    <filter string="Hết hiệu lực" name="inactive" domain="[('is_active', '=', False)]"/>
+                    <separator/>
+                    <filter string="Quốc gia" name="national" domain="[('regulation_type', '=', 'national')]"/>
+                    <filter string="Quốc tế" name="international" domain="[('regulation_type', '=', 'international')]"/>
+                    <filter string="Địa phương" name="local" domain="[('regulation_type', '=', 'local')]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_type" string="Loại quy định" context="{'group_by': 'regulation_type'}"/>
+                        <filter name="group_by_issuing_authority" string="Cơ quan ban hành" context="{'group_by': 'issuing_authority'}"/>
+                        <filter name="group_by_responsible" string="Người phụ trách" context="{'group_by': 'responsible_user_id'}"/>
+                        <filter name="group_by_effective_date" string="Ngày hiệu lực" context="{'group_by': 'effective_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_medical_regulation" model="ir.actions.act_window">
+            <field name="name">Quy định Y tế</field>
+            <field name="res_model">medical.regulation</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_medical_regulation_tree"/>
+            <field name="search_view_id" ref="view_medical_regulation_search"/>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Tạo quy định y tế đầu tiên!
+                </p>
+                <p>
+                    Quản lý tất cả các quy định y tế mà tổ chức của bạn phải tuân thủ.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

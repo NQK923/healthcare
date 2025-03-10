@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="view_compliance_report_form" model="ir.ui.view">
+            <field name="name">compliance.report.form</field>
+            <field name="model">compliance.report</field>
+            <field name="arch" type="xml">
+                <form string="Báo cáo tuân thủ">
+                    <header>
+                        <button name="action_confirm" string="Xác nhận" type="object" class="oe_highlight"
+                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <button name="action_approve" string="Phê duyệt" type="object" class="oe_highlight"
+                                attrs="{'invisible': [('state', '!=', 'confirmed')]}"/>
+                        <button name="action_draft" string="Quay lại dự thảo" type="object"
+                                attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                        <button name="action_generate_summary" string="Tạo tóm tắt" type="object"
+                                attrs="{'invisible': [('state', '=', 'approved')]}"/>
+                        <button name="print_report" string="In báo cáo" type="object"
+                                attrs="{'invisible': [('state', '!=', 'approved')]}"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,approved"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Tên báo cáo"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                                <field name="user_id"/>
+                                <field name="confirmed_by" readonly="1" attrs="{'invisible': [('confirmed_by', '=', False)]}"/>
+                                <field name="confirmed_date" readonly="1" attrs="{'invisible': [('confirmed_date', '=', False)]}"/>
+                            </group>
+                            <group>
+                                <field name="total_checks"/>
+                                <field name="compliant_checks"/>
+                                <field name="partial_checks"/>
+                                <field name="non_compliant_checks"/>
+                                <field name="compliance_percentage" widget="percentage"/>
+                                <field name="approved_by" readonly="1" attrs="{'invisible': [('approved_by', '=', False)]}"/>
+                                <field name="approved_date" readonly="1" attrs="{'invisible': [('approved_date', '=', False)]}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Phạm vi" name="scope">
+                                <group>
+                                    <field name="regulation_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                    <field name="department_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                </group>
+                            </page>
+                            <page string="Tóm tắt" name="summary">
+                                <field name="summary" placeholder="Tóm tắt báo cáo..."/>
+                            </page>
+                            <page string="Kết luận" name="conclusion">
+                                <field name="conclusion" placeholder="Kết luận về tình hình tuân thủ..."/>
+                            </page>
+                            <page string="Khuyến nghị" name="recommendation">
+                                <field name="recommendation" placeholder="Các khuyến nghị để cải thiện tuân thủ..."/>
+                            </page>
+                            <page string="Đợt kiểm tra" name="checks">
+                                <field name="check_ids" readonly="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="regulation_id"/>
+                                        <field name="check_date"/>
+                                        <field name="result"/>
+                                        <field name="compliance_score" widget="percentage"/>
+                                        <field name="state" widget="badge"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Hành động khắc phục" name="corrective_actions">
+                                <field name="corrective_action_ids" readonly="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="compliance_check_id"/>
+                                        <field name="regulation_id"/>
+                                        <field name="deadline"/>
+                                        <field name="state" widget="badge"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_compliance_report_tree" model="ir.ui.view">
+            <field name="name">compliance.report.tree</field>
+            <field name="model">compliance.report</field>
+            <field name="arch" type="xml">
+                <tree string="Báo cáo tuân thủ" decoration-success="compliance_percentage >= 90" decoration-warning="compliance_percentage < 90 and compliance_percentage >= 70" decoration-danger="compliance_percentage < 70">

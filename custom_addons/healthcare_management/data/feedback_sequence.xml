@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sequence for Feedback -->
+        <record id="seq_healthcare_feedback" model="ir.sequence">
+            <field name="name">Mã phản hồi bệnh nhân</field>
+            <field name="code">healthcare.feedback.sequence</field>
+            <field name="prefix">FB</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

@@ -3,10 +3,14 @@
     <field name="name">healthcare.feedback.tree</field>
     <field name="model">healthcare.feedback</field>
     <field name="arch" type="xml">
-      <list string="Danh sách phản hồi">
+      <list string="Danh sách phản hồi" decoration-danger="priority=='3'" decoration-warning="priority=='2'" decoration-info="priority=='1'" decoration-muted="state=='closed'">
+        <field name="name"/>
         <field name="patient_id"/>
+        <field name="feedback_type"/>
         <field name="date"/>
         <field name="rating"/>
+        <field name="priority" widget="priority"/>
+        <field name="state"/>
       </list>
     </field>
   </record>
@@ -16,26 +20,131 @@
     <field name="model">healthcare.feedback</field>
     <field name="arch" type="xml">
       <form string="Phản hồi của bệnh nhân">
+        <header>
+          <button name="action_review" string="Bắt đầu xem xét" type="object" class="oe_highlight" invisible="[('state', '!=', 'new')]"/>
+          <button name="action_address" string="Đánh dấu đã giải quyết" type="object" class="oe_highlight" invisible="[('state', '!=', 'in_review')]"/>
+          <button name="action_close" string="Đóng phản hồi" type="object" class="oe_highlight" invisible="[('state', '!=', 'addressed')]"/>
+          <button name="action_reset" string="Đặt lại thành mới" type="object" invisible="[('state', 'not in', ['in_review','addressed'])]"/>
+          <field name="state" widget="statusbar" statusbar_visible="new,in_review,addressed,closed"/>
+        </header>
         <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button name="action_view_patient" type="object" class="oe_stat_button" icon="fa-user">
+              <field name="patient_id" string="Bệnh nhân" widget="statinfo"/>
+            </button>
+            <button name="action_view_appointment" type="object" class="oe_stat_button" icon="fa-calendar" invisible="[('appointment_id', '=', False)]">
+              <field name="appointment_id" string="Lịch hẹn" widget="statinfo"/>
+            </button>
+          </div>
+          <div class="oe_title">
+            <h1>
+              <field name="name" readonly="1"/>
+            </h1>
+            <h2>
+              <field name="priority" widget="priority" class="mr-3"/>
+            </h2>
+          </div>
           <group>
-            <field name="patient_id"/>
-            <field name="date"/>
-            <field name="rating"/>
+            <group>
+              <field name="patient_id"/>
+              <field name="feedback_type"/>
+              <field name="date"/>
+              <field name="appointment_id"/>
+            </group>
+            <group>
+              <field name="rating" widget="radio"/>
+              <field name="handled_by" invisible="[('state', '=', 'new')]" required="[('state', 'in', ['in_review','addressed'])]"/>
+            </group>
           </group>
-          <group>
-            <field name="feedback" widget="text"/>
-          </group>
+          <notebook>
+            <page string="Nội dung phản hồi">
+              <field name="feedback" widget="html" placeholder="Nội dung chi tiết phản hồi từ bệnh nhân..."/>
+            </page>
+            <page string="Xử lý phản hồi" invisible="[('state', '=', 'new')]">
+              <field name="handling_note" widget="html" placeholder="Ghi chú cách xử lý phản hồi..."/>
+            </page>
+          </notebook>
         </sheet>
+        <div class="oe_chatter">
+          <field name="message_follower_ids"/>
+          <field name="activity_ids"/>
+          <field name="message_ids"/>
+        </div>
       </form>
+    </field>
+  </record>
+
+  <record id="view_healthcare_feedback_search" model="ir.ui.view">
+    <field name="name">healthcare.feedback.search</field>
+    <field name="model">healthcare.feedback</field>
+    <field name="arch" type="xml">
+      <search string="Tìm kiếm phản hồi">
+        <field name="name"/>
+        <field name="patient_id"/>
+        <field name="feedback_type"/>
+        <field name="feedback"/>
+        <field name="handled_by"/>
+        <filter string="Phản hồi tiêu cực" name="negative_feedback" domain="[('rating', 'in', ['1', '2'])]"/>
+        <filter string="Phản hồi tích cực" name="positive_feedback" domain="[('rating', 'in', ['4', '5'])]"/>
+        <filter string="Phản hồi mới" name="new_feedback" domain="[('state', '=', 'new')]"/>
+        <filter string="Ưu tiên cao" name="high_priority" domain="[('priority', 'in', ['2', '3'])]"/>
+        <separator/>
+        <filter string="Dịch vụ" name="type_service" domain="[('feedback_type', '=', 'service')]"/>
+        <filter string="Bác sĩ" name="type_doctor" domain="[('feedback_type', '=', 'doctor')]"/>
+        <filter string="Cơ sở vật chất" name="type_facility" domain="[('feedback_type', '=', 'facility')]"/>
+        <filter string="Nhân viên" name="type_staff" domain="[('feedback_type', '=', 'staff')]"/>
+        <filter string="Giá cả" name="type_price" domain="[('feedback_type', '=', 'price')]"/>
+        <group expand="0" string="Nhóm theo">
+          <filter string="Loại phản hồi" name="group_feedback_type" context="{'group_by': 'feedback_type'}"/>
+          <filter string="Đánh giá" name="group_rating" context="{'group_by': 'rating'}"/>
+          <filter string="Trạng thái" name="group_state" context="{'group_by': 'state'}"/>
+          <filter string="Ngày phản hồi" name="group_date" context="{'group_by': 'date'}"/>
+          <filter string="Ưu tiên" name="group_priority" context="{'group_by': 'priority'}"/>
+          <filter string="Người xử lý" name="group_handled_by" context="{'group_by': 'handled_by'}"/>
+        </group>
+      </search>
+    </field>
+  </record>
+
+  <record id="view_healthcare_feedback_pivot" model="ir.ui.view">
+    <field name="name">healthcare.feedback.pivot</field>
+    <field name="model">healthcare.feedback</field>
+    <field name="arch" type="xml">
+      <pivot string="Phân tích phản hồi">
+        <field name="feedback_type" type="row"/>
+        <field name="rating" type="col"/>
+        <field name="patient_id" type="measure"/>
+      </pivot>
+    </field>
+  </record>
+
+  <record id="view_healthcare_feedback_graph" model="ir.ui.view">
+    <field name="name">healthcare.feedback.graph</field>
+    <field name="model">healthcare.feedback</field>
+    <field name="arch" type="xml">
+      <graph string="Biểu đồ phản hồi">
+        <field name="feedback_type"/>
+        <field name="rating"/>
+      </graph>
     </field>
   </record>
 
   <record id="action_healthcare_feedback" model="ir.actions.act_window">
     <field name="name">Phản hồi</field>
     <field name="res_model">healthcare.feedback</field>
-    <field name="view_mode">list,form</field>
+    <field name="view_mode">list,form,pivot,graph</field>
+    <field name="context">{'search_default_new_feedback': 1}</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+        Tạo phản hồi đầu tiên từ bệnh nhân
+      </p>
+      <p>
+        Theo dõi phản hồi của bệnh nhân để cải thiện chất lượng dịch vụ y tế.
+      </p>
+    </field>
   </record>
 
   <menuitem id="menu_healthcare_feedback" name="Phản hồi" parent="menu_healthcare_root" sequence="3"/>
   <menuitem id="menu_healthcare_feedback_sub" name="Quản lý phản hồi" parent="menu_healthcare_feedback" action="action_healthcare_feedback"/>
+  <menuitem id="menu_healthcare_feedback_analysis" name="Phân tích phản hồi" parent="menu_healthcare_feedback" action="action_healthcare_feedback"/>
 </odoo>

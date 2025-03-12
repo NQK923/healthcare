@@ -8,13 +8,13 @@
             <form string="Kiểm tra y tế">
                 <header>
                     <button name="action_start" string="Bắt đầu" type="object"
-                            attrs="{'invisible': [('state', '!=', 'planned')]}" class="oe_highlight"/>
+                            invisible="[('state', '!=', 'planned')]" class="oe_highlight"/>
                     <button name="action_complete" string="Hoàn thành" type="object"
-                            attrs="{'invisible': [('state', '!=', 'in_progress')]}" class="oe_highlight"/>
+                            invisible="[('state', '!=', 'in_progress')]" class="oe_highlight"/>
                     <button name="action_cancel" string="Hủy bỏ" type="object"
-                            attrs="{'invisible': [('state', 'in', ['completed', 'canceled'])]}"/>
+                            invisible="[('state', 'in', ['completed', 'canceled'])]"/>
                     <button name="action_reset" string="Đặt lại" type="object"
-                            attrs="{'invisible': [('state', '=', 'planned')]}"/>
+                            invisible="[('state', '=', 'planned')]"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="planned,in_progress,completed"/>
                 </header>
@@ -35,8 +35,8 @@
                             <field name="result"/>
                             <field name="responsible_id"/>
                             <field name="corrective_action_required"/>
-                            <field name="corrective_deadline" attrs="{'invisible': [('corrective_action_required', '=', False)], 'required': [('corrective_action_required', '=', True)]}"/>
-                            <field name="corrective_completed" attrs="{'invisible': [('corrective_action_required', '=', False)]}"/>
+                            <field name="corrective_deadline" invisible="[('corrective_action_required', '=', False)]" required="[('corrective_action_required', '=', True)]"/>
+                            <field name="corrective_completed" invisible="[('corrective_action_required', '=', False)]"/>
                         </group>
                     </group>
                     <notebook>
@@ -47,7 +47,7 @@
                                 <field name="notes" placeholder="Ghi chú bổ sung..."/>
                             </group>
                         </page>
-                        <page string="Hành động khắc phục" attrs="{'invisible': [('corrective_action_required', '=', False)]}">
+                        <page string="Hành động khắc phục" invisible="[('corrective_action_required', '=', False)]">
                             <field name="corrective_action" placeholder="Mô tả các hành động khắc phục cần thực hiện..."/>
                         </page>
                         <page string="Tài liệu">
@@ -72,7 +72,7 @@
         <field name="name">hospital.inspection.tree</field>
         <field name="model">hospital.inspection</field>
         <field name="arch" type="xml">
-            <tree string="Kiểm tra y tế" decoration-danger="result=='failed'" decoration-success="result=='passed'" decoration-warning="result=='conditional'">
+            <list string="Kiểm tra y tế" decoration-danger="result=='failed'" decoration-success="result=='passed'" decoration-warning="result=='conditional'">
                 <field name="date"/>
                 <field name="name"/>
                 <field name="certification_id"/>
@@ -81,7 +81,7 @@
                 <field name="state"/>
                 <field name="corrective_action_required"/>
                 <field name="corrective_completed"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -126,7 +126,7 @@
     <record id="action_hospital_inspection" model="ir.actions.act_window">
         <field name="name">Kiểm tra y tế</field>
         <field name="res_model">hospital.inspection</field>
-        <field name="view_mode">tree,form,calendar</field>
+        <field name="view_mode">list,form,calendar</field>
         <field name="context">{'search_default_planned': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

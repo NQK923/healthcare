@@ -1,24 +1,28 @@
+# -*- coding: utf-8 -*-
+
 {
-    'name': "Healthcare Management",
+    'name': 'Quản Lý Chăm Sóc Khách Hàng Y Tế',
     'version': '1.0',
-    'summary': "Quản lý liên lạc và chăm sóc khách hàng cho bệnh nhân",
+    'summary': 'Quản lý phản hồi của bệnh nhân và chăm sóc khách hàng',
     'description': """
-        Module giúp quản lý lịch hẹn, gửi thông báo, email, SMS và quản lý phản hồi, khiếu nại từ bệnh nhân.
+        Module quản lý liên lạc và chăm sóc khách hàng trong lĩnh vực y tế:
+        - Quản lý phản hồi từ bệnh nhân
+        - Xử lý khiếu nại 
+        - Theo dõi cải thiện dịch vụ chăm sóc sức khỏe
     """,
-    'author': "Tên của bạn",
-    'website': "http://example.com",
     'category': 'Healthcare',
-    'depends': ['base', 'mail'],
+    'author': 'Your Company',
+    'website': 'https://www.yourcompany.com',
+    'depends': ['base', 'mail', 'contacts'],
     'data': [
         'security/ir.model.access.csv',
-        'data/email_templates.xml',
-        'data/scheduler_data.xml',
-        'data/feedback_sequence.xml',
-        'views/patient_views.xml',
-        'views/appointment_views.xml',
-        'views/feedback_views.xml',
+        'views/patient_feedback_views.xml',
         'views/complaint_views.xml',
+        'views/menu_views.xml',
+        'data/sequence.xml',
     ],
+    'demo': [],
     'installable': True,
     'application': True,
+    'auto_install': False,
 }

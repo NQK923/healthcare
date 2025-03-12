@@ -14,7 +14,7 @@
             <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
 
-        <!-- Quy tắc bảo mật hồ sơ -->
+<!--        &lt;!&ndash; Quy tắc bảo mật hồ sơ &ndash;&gt;
         <record id="certification_comp_rule" model="ir.rule">
             <field name="name">Chứng nhận: quy tắc đa công ty</field>
             <field name="model_id" ref="model_hospital_certification"/>
@@ -25,6 +25,6 @@
             <field name="name">Kiểm tra: quy tắc đa công ty</field>
             <field name="model_id" ref="model_hospital_inspection"/>
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
-        </record>
+        </record>-->
     </data>
 </odoo>

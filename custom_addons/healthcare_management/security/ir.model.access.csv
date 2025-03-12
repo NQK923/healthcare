@@ -1,5 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_healthcare_patient,access_healthcare_patient,model_healthcare_patient,,1,1,1,1
-access_healthcare_appointment,access_healthcare_appointment,model_healthcare_appointment,,1,1,1,1
-access_healthcare_feedback,access_healthcare_feedback,model_healthcare_feedback,,1,1,1,1
-access_healthcare_complaint,access_healthcare_complaint,model_healthcare_complaint,,1,1,1,1
+access_healthcare_patient_feedback_user,healthcare.patient.feedback.user,model_healthcare_patient_feedback,base.group_user,1,1,1,0
+access_healthcare_patient_feedback_manager,healthcare.patient.feedback.manager,model_healthcare_patient_feedback,base.group_system,1,1,1,1
+access_healthcare_patient_complaint_user,healthcare.patient.complaint.user,model_healthcare_patient_complaint,base.group_user,1,1,1,0
+access_healthcare_patient_complaint_manager,healthcare.patient.complaint.manager,model_healthcare_patient_complaint,base.group_system,1,1,1,1
+access_healthcare_complaint_category_user,healthcare.complaint.category.user,model_healthcare_complaint_category,base.group_user,1,0,0,0
+access_healthcare_complaint_category_manager,healthcare.complaint.category.manager,model_healthcare_complaint_category,base.group_system,1,1,1,1
+access_healthcare_complaint_action_user,healthcare.complaint.action.user,model_healthcare_complaint_action,base.group_user,1,1,1,1

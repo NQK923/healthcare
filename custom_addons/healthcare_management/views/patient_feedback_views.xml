@@ -8,11 +8,11 @@
         <field name="arch" type="xml">
             <form string="Phản hồi từ bệnh nhân">
                 <header>
-                    <button name="action_in_progress" string="Xử lý" type="object" class="oe_highlight" states="draft"/>
-                    <button name="action_resolved" string="Giải quyết" type="object" class="oe_highlight" states="in_progress"/>
-                    <button name="action_cancel" string="Hủy" type="object" states="draft,in_progress"/>
-                    <button name="action_draft" string="Thiết lập thành Mới" type="object" states="cancelled"/>
-                    <button name="action_create_complaint" string="Tạo khiếu nại" type="object" attrs="{'invisible': [('complaint_id', '!=', False)]}" class="btn-primary"/>
+                    <button name="action_in_progress" string="Xử lý" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_resolved" string="Giải quyết" type="object" class="oe_highlight" invisible="state != 'in_progress'"/>
+                    <button name="action_cancel" string="Hủy" type="object" invisible="state not in ('draft', 'in_progress')"/>
+                    <button name="action_draft" string="Thiết lập thành Mới" type="object" invisible="state != 'cancelled'"/>
+                    <button name="action_create_complaint" string="Tạo khiếu nại" type="object" invisible="complaint_id != False" class="btn-primary"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,resolved"/>
                 </header>
                 <sheet>
@@ -31,15 +31,15 @@
                         <group>
                             <field name="department_id"/>
                             <field name="satisfaction_rating" widget="priority"/>
-                            <field name="complaint_id" readonly="1" attrs="{'invisible': [('complaint_id', '=', False)]}"/>
-                            <field name="resolved_date" readonly="1" attrs="{'invisible': [('resolved_date', '=', False)]}"/>
+                            <field name="complaint_id" readonly="1" invisible="complaint_id == False"/>
+                            <field name="resolved_date" readonly="1" invisible="resolved_date == False"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Nội dung phản hồi">
                             <field name="description" placeholder="Nhập chi tiết phản hồi từ bệnh nhân..."/>
                         </page>
-                        <page string="Giải pháp" attrs="{'invisible': [('state', 'in', ['draft', 'cancelled'])]}">
+                        <page string="Giải pháp" invisible="state in ('draft', 'cancelled')">
                             <field name="resolution" placeholder="Nhập phương án giải quyết..."/>
                         </page>
                     </notebook>
@@ -58,7 +58,7 @@
         <field name="name">healthcare.patient.feedback.tree</field>
         <field name="model">healthcare.patient.feedback</field>
         <field name="arch" type="xml">
-            <tree string="Phản hồi từ bệnh nhân" decoration-danger="state=='draft'" decoration-success="state=='resolved'" decoration-info="state=='in_progress'" decoration-muted="state=='cancelled'">
+            <list string="Phản hồi từ bệnh nhân" decoration-danger="state=='draft'" decoration-success="state=='resolved'" decoration-info="state=='in_progress'" decoration-muted="state=='cancelled'">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="feedback_date"/>
@@ -66,7 +66,7 @@
                 <field name="user_id"/>
                 <field name="state"/>
                 <field name="satisfaction_rating" widget="priority"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -104,7 +104,7 @@
     <record id="action_patient_feedback" model="ir.actions.act_window">
         <field name="name">Phản hồi của bệnh nhân</field>
         <field name="res_model">healthcare.patient.feedback</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_patient_feedback_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

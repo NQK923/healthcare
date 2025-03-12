@@ -8,17 +8,17 @@
         <field name="arch" type="xml">
             <form string="Khiếu nại từ bệnh nhân">
                 <header>
-                    <button name="action_validate" string="Xác nhận" type="object" class="oe_highlight" states="draft"/>
-                    <button name="action_investigate" string="Điều tra" type="object" class="oe_highlight" states="validated"/>
-                    <button name="action_take_action" string="Thực hiện biện pháp" type="object" class="oe_highlight" states="investigating"/>
-                    <button name="action_resolve" string="Giải quyết" type="object" class="oe_highlight" states="action_taken"/>
-                    <button name="action_close" string="Đóng" type="object" class="oe_highlight" states="resolved"/>
-                    <button name="action_cancel" string="Hủy" type="object" states="draft,validated,investigating"/>
-                    <button name="action_draft" string="Thiết lập thành Mới" type="object" states="cancelled"/>
+                    <button name="action_validate" string="Xác nhận" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_investigate" string="Điều tra" type="object" class="oe_highlight" invisible="state != 'validated'"/>
+                    <button name="action_take_action" string="Thực hiện biện pháp" type="object" class="oe_highlight" invisible="state != 'investigating'"/>
+                    <button name="action_resolve" string="Giải quyết" type="object" class="oe_highlight" invisible="state != 'action_taken'"/>
+                    <button name="action_close" string="Đóng" type="object" class="oe_highlight" invisible="state != 'resolved'"/>
+                    <button name="action_cancel" string="Hủy" type="object" invisible="state not in ('draft','validated','investigating')"/>
+                    <button name="action_draft" string="Thiết lập thành Mới" type="object" invisible="state != 'cancelled'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,validated,investigating,action_taken,resolved,closed"/>
                 </header>
                 <sheet>
-                    <div class="alert alert-danger" role="alert" attrs="{'invisible': [('is_overdue', '=', False)]}">
+                    <div class="alert alert-danger" role="alert" invisible="not is_overdue">
                         <strong>Cảnh báo!</strong> Khiếu nại này đã quá hạn.
                     </div>
                     <div class="oe_title">
@@ -38,29 +38,29 @@
                             <field name="user_id"/>
                             <field name="department_id"/>
                             <field name="deadline"/>
-                            <field name="feedback_id" readonly="1" attrs="{'invisible': [('feedback_id', '=', False)]}"/>
-                            <field name="resolved_date" readonly="1" attrs="{'invisible': [('resolved_date', '=', False)]}"/>
+                            <field name="feedback_id" readonly="1" invisible="not feedback_id"/>
+                            <field name="resolved_date" readonly="1" invisible="not resolved_date"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Nội dung khiếu nại">
                             <field name="description" placeholder="Nhập chi tiết khiếu nại từ bệnh nhân..."/>
                         </page>
-                        <page string="Điều tra" attrs="{'invisible': [('state', 'in', ['draft', 'validated', 'cancelled'])]}">
+                        <page string="Điều tra" invisible="state in ('draft', 'validated', 'cancelled')">
                             <group>
                                 <field name="root_cause" placeholder="Nhập nguyên nhân gốc rễ..."/>
                             </group>
                         </page>
-                        <page string="Biện pháp" attrs="{'invisible': [('state', 'in', ['draft', 'validated', 'investigating', 'cancelled'])]}">
+                        <page string="Biện pháp" invisible="state in ('draft', 'validated', 'investigating', 'cancelled')">
                             <group>
                                 <field name="action_taken" placeholder="Nhập biện pháp đã thực hiện..."/>
                                 <field name="improvement_suggestion" placeholder="Nhập đề xuất cải thiện..."/>
                             </group>
                         </page>
-                        <page string="Giải pháp" attrs="{'invisible': [('state', 'in', ['draft', 'validated', 'investigating', 'action_taken', 'cancelled'])]}">
+                        <page string="Giải pháp" invisible="state in ('draft', 'validated', 'investigating', 'action_taken', 'cancelled')">
                             <field name="resolution" placeholder="Nhập phương án giải quyết..."/>
                         </page>
-                        <page string="Đánh giá" attrs="{'invisible': [('state', '!=', 'closed')]}">
+                        <page string="Đánh giá" invisible="state != 'closed'">
                             <group>
                                 <field name="satisfaction_rating" widget="priority"/>
                             </group>
@@ -81,7 +81,7 @@
         <field name="name">healthcare.patient.complaint.tree</field>
         <field name="model">healthcare.patient.complaint</field>
         <field name="arch" type="xml">
-            <tree string="Khiếu nại từ bệnh nhân" decoration-danger="is_overdue" decoration-success="state=='closed'" decoration-info="state=='investigating'" decoration-muted="state=='cancelled'" decoration-warning="state=='action_taken'">
+            <list string="Khiếu nại từ bệnh nhân" decoration-danger="is_overdue" decoration-success="state=='closed'" decoration-info="state=='investigating'" decoration-muted="state=='cancelled'" decoration-warning="state=='action_taken'">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="complaint_date"/>
@@ -91,7 +91,7 @@
                 <field name="deadline"/>
                 <field name="is_overdue" invisible="1"/>
                 <field name="state"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -144,12 +144,12 @@
                         <field name="description"/>
                     </group>
                     <notebook>
-                        <page string="Danh mục con" attrs="{'invisible': [('child_ids', '=', [])]}">
+                        <page string="Danh mục con" invisible="not child_ids">
                             <field name="child_ids">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="description"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -163,11 +163,11 @@
         <field name="name">healthcare.complaint.category.tree</field>
         <field name="model">healthcare.complaint.category</field>
         <field name="arch" type="xml">
-            <tree string="Danh mục khiếu nại">
+            <list string="Danh mục khiếu nại">
                 <field name="name"/>
                 <field name="parent_id"/>
                 <field name="description"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -195,7 +195,7 @@
     <record id="action_patient_complaint" model="ir.actions.act_window">
         <field name="name">Khiếu nại của bệnh nhân</field>
         <field name="res_model">healthcare.patient.complaint</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_patient_complaint_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -208,7 +208,7 @@
     <record id="action_complaint_category" model="ir.actions.act_window">
         <field name="name">Danh mục khiếu nại</field>
         <field name="res_model">healthcare.complaint.category</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Tạo danh mục khiếu nại đầu tiên

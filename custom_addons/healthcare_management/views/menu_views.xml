@@ -20,17 +20,4 @@
               parent="menu_healthcare_customer_care_root"
               action="action_patient_complaint"
               sequence="20"/>
-
-    <!-- Configuration Menu -->
-    <menuitem id="menu_healthcare_configuration"
-              name="Cấu hình"
-              parent="menu_healthcare_customer_care_root"
-              sequence="100"/>
-
-    <!-- Complaint Category Menu -->
-    <menuitem id="menu_healthcare_complaint_category"
-              name="Danh mục khiếu nại"
-              parent="menu_healthcare_configuration"
-              action="action_complaint_category"
-              sequence="10"/>
 </odoo>

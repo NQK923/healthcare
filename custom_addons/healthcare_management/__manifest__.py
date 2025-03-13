@@ -13,7 +13,7 @@
     'category': 'Healthcare',
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
-    'depends': ['base', 'mail', 'contacts'],
+    'depends': ['base', 'mail', 'contacts','hr'],
     'data': [
         'security/ir.model.access.csv',
         'views/patient_feedback_views.xml',

@@ -14,6 +14,7 @@ class PatientFeedback(models.Model):
     name = fields.Char(string='Mã phản hồi', required=True, copy=False, readonly=True,
                        default=lambda self: _('New'))
     partner_id = fields.Many2one('res.partner', string='Bệnh nhân', required=True, tracking=True)
+    department_id = fields.Many2one('hr.department', string='Phòng ban', tracking=True)
     feedback_date = fields.Date(string='Ngày phản hồi', default=fields.Date.context_today, tracking=True)
     feedback_type = fields.Selection([
         ('compliment', 'Khen ngợi'),
@@ -34,7 +35,7 @@ class PatientFeedback(models.Model):
     resolution = fields.Text(string='Phương án giải quyết')
     resolved_date = fields.Date(string='Ngày giải quyết')
     user_id = fields.Many2one('res.users', string='Người phụ trách', default=lambda self: self.env.user)
-    department_id = fields.Many2one('hr.department', string='Phòng ban liên quan')
+
     satisfaction_rating = fields.Selection([
         ('1', 'Rất không hài lòng'),
         ('2', 'Không hài lòng'),
@@ -97,9 +98,7 @@ class PatientComplaint(models.Model):
     description = fields.Text(string='Nội dung khiếu nại', required=True)
     state = fields.Selection([
         ('draft', 'Mới'),
-        ('validated', 'Đã xác nhận'),
-        ('investigating', 'Đang điều tra'),
-        ('action_taken', 'Đã thực hiện biện pháp'),
+        ('investigating', 'Đang xử lý'),
         ('resolved', 'Đã giải quyết'),
         ('closed', 'Đã đóng'),
         ('cancelled', 'Đã hủy')
@@ -108,19 +107,22 @@ class PatientComplaint(models.Model):
     priority = fields.Selection([
         ('0', 'Thấp'),
         ('1', 'Trung bình'),
-        ('2', 'Cao'),
-        ('3', 'Rất cao')
+        ('2', 'Cao')
     ], string='Mức độ ưu tiên', default='1', tracking=True)
 
-    category_id = fields.Many2one('healthcare.complaint.category', string='Danh mục khiếu nại')
+    category = fields.Selection([
+        ('service', 'Dịch vụ'),
+        ('staff', 'Nhân viên'),
+        ('facility', 'Cơ sở vật chất'),
+        ('billing', 'Thanh toán'),
+        ('other', 'Khác')
+    ], string='Phân loại khiếu nại', required=True, tracking=True)
+
     feedback_id = fields.Many2one('healthcare.patient.feedback', string='Phản hồi liên quan')
     user_id = fields.Many2one('res.users', string='Người phụ trách', default=lambda self: self.env.user)
-    department_id = fields.Many2one('hr.department', string='Phòng ban liên quan')
 
     resolution = fields.Text(string='Phương án giải quyết')
     action_taken = fields.Text(string='Biện pháp thực hiện')
-    root_cause = fields.Text(string='Nguyên nhân gốc rễ')
-    improvement_suggestion = fields.Text(string='Đề xuất cải thiện')
 
     resolved_date = fields.Date(string='Ngày giải quyết')
     deadline = fields.Date(string='Hạn chót', compute='_compute_deadline', store=True)
@@ -138,9 +140,7 @@ class PatientComplaint(models.Model):
     def _compute_deadline(self):
         for record in self:
             if record.complaint_date:
-                if record.priority == '3':  # Rất cao
-                    record.deadline = record.complaint_date + timedelta(days=1)
-                elif record.priority == '2':  # Cao
+                if record.priority == '2':  # Cao
                     record.deadline = record.complaint_date + timedelta(days=3)
                 elif record.priority == '1':  # Trung bình
                     record.deadline = record.complaint_date + timedelta(days=7)
@@ -164,25 +164,10 @@ class PatientComplaint(models.Model):
                 vals['name'] = self.env['ir.sequence'].next_by_code('healthcare.patient.complaint') or _('New')
         return super(PatientComplaint, self).create(vals_list)
 
-    def action_validate(self):
-        self.write({'state': 'validated'})
-
     def action_investigate(self):
         self.write({'state': 'investigating'})
 
-    def action_take_action(self):
-        return {
-            'name': _('Thực hiện biện pháp'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'healthcare.complaint.action',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {'default_complaint_id': self.id}
-        }
-
     def action_resolve(self):
-        if not self.action_taken:
-            raise ValidationError(_('Vui lòng nhập biện pháp đã thực hiện trước khi giải quyết khiếu nại.'))
         self.write({
             'state': 'resolved',
             'resolved_date': fields.Date.context_today(self)
@@ -196,33 +181,3 @@ class PatientComplaint(models.Model):
 
     def action_draft(self):
         self.write({'state': 'draft'})
-
-
-class ComplaintCategory(models.Model):
-    _name = 'healthcare.complaint.category'
-    _description = 'Danh mục khiếu nại'
-
-    name = fields.Char(string='Tên danh mục', required=True)
-    description = fields.Text(string='Mô tả')
-    parent_id = fields.Many2one('healthcare.complaint.category', string='Danh mục cha')
-    child_ids = fields.One2many('healthcare.complaint.category', 'parent_id', string='Danh mục con')
-
-
-class ComplaintAction(models.TransientModel):
-    _name = 'healthcare.complaint.action'
-    _description = 'Wizard thực hiện biện pháp cho khiếu nại'
-
-    complaint_id = fields.Many2one('healthcare.patient.complaint', string='Khiếu nại', required=True)
-    action_taken = fields.Text(string='Biện pháp thực hiện', required=True)
-    root_cause = fields.Text(string='Nguyên nhân gốc rễ')
-    improvement_suggestion = fields.Text(string='Đề xuất cải thiện')
-
-    def action_confirm(self):
-        self.ensure_one()
-        self.complaint_id.write({
-            'state': 'action_taken',
-            'action_taken': self.action_taken,
-            'root_cause': self.root_cause,
-            'improvement_suggestion': self.improvement_suggestion,
-        })
-        return {'type': 'ir.actions.act_window_close'}

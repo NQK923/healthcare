@@ -8,12 +8,11 @@
         <field name="arch" type="xml">
             <form string="Phản hồi từ bệnh nhân">
                 <header>
-                    <button name="action_in_progress" string="Xử lý" type="object" class="oe_highlight" invisible="state != 'draft'"/>
-                    <button name="action_resolved" string="Giải quyết" type="object" class="oe_highlight" invisible="state != 'in_progress'"/>
-                    <button name="action_cancel" string="Hủy" type="object" invisible="state not in ('draft', 'in_progress')"/>
-                    <button name="action_draft" string="Thiết lập thành Mới" type="object" invisible="state != 'cancelled'"/>
+                    <button name="action_note" string="Ghi nhận" type="object" class="oe_highlight" invisible="state != 'new'"/>
+                    <button name="action_cancel" string="Hủy" type="object" invisible="state not in ('new', 'noted')"/>
+                    <button name="action_new" string="Thiết lập thành Mới" type="object" invisible="state != 'cancelled'"/>
                     <button name="action_create_complaint" string="Tạo khiếu nại" type="object" invisible="complaint_id != False" class="btn-primary"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,resolved"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,noted"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -32,15 +31,11 @@
                             <field name="department_id"/>
                             <field name="satisfaction_rating" widget="priority"/>
                             <field name="complaint_id" readonly="1" invisible="complaint_id == False"/>
-                            <field name="resolved_date" readonly="1" invisible="resolved_date == False"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Nội dung phản hồi">
                             <field name="description" placeholder="Nhập chi tiết phản hồi từ bệnh nhân..."/>
-                        </page>
-                        <page string="Giải pháp" invisible="state in ('draft', 'cancelled')">
-                            <field name="resolution" placeholder="Nhập phương án giải quyết..."/>
                         </page>
                     </notebook>
                 </sheet>
@@ -58,7 +53,7 @@
         <field name="name">healthcare.patient.feedback.tree</field>
         <field name="model">healthcare.patient.feedback</field>
         <field name="arch" type="xml">
-            <list string="Phản hồi từ bệnh nhân" decoration-danger="state=='draft'" decoration-success="state=='resolved'" decoration-info="state=='in_progress'" decoration-muted="state=='cancelled'">
+            <list string="Phản hồi từ bệnh nhân" decoration-danger="state=='new'" decoration-success="state=='noted'" decoration-muted="state=='cancelled'">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="feedback_date"/>
@@ -80,9 +75,8 @@
                 <field name="partner_id"/>
                 <field name="description"/>
                 <separator/>
-                <filter string="Mới" domain="[('state','=','draft')]" name="state_draft"/>
-                <filter string="Đang xử lý" domain="[('state','=','in_progress')]" name="state_progress"/>
-                <filter string="Đã giải quyết" domain="[('state','=','resolved')]" name="state_resolved"/>
+                <filter string="Mới" domain="[('state','=','new')]" name="state_new"/>
+                <filter string="Đã ghi nhận" domain="[('state','=','noted')]" name="state_noted"/>
                 <filter string="Đã hủy" domain="[('state','=','cancelled')]" name="state_cancelled"/>
                 <separator/>
                 <filter string="Khen ngợi" domain="[('feedback_type','=','compliment')]" name="type_compliment"/>
@@ -110,47 +104,6 @@
             <p class="o_view_nocontent_smiling_face">
                 Tạo phản hồi đầu tiên từ bệnh nhân
             </p>
-        </field>
-    </record>
-
-    <!-- Kanban View for Patient Feedback -->
-    <record id="view_patient_feedback_kanban" model="ir.ui.view">
-        <field name="name">healthcare.patient.feedback.kanban</field>
-        <field name="model">healthcare.patient.feedback</field>
-        <field name="arch" type="xml">
-            <kanban default_group_by="state" class="o_kanban_small_column" records_draggable="0">
-                <field name="name"/>
-                <field name="partner_id"/>
-                <field name="feedback_date"/>
-                <field name="feedback_type"/>
-                <field name="state"/>
-                <field name="user_id"/>
-                <templates>
-                    <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_global_click">
-                            <div class="oe_kanban_details">
-                                <strong class="o_kanban_record_title">
-                                    <field name="name"/>
-                                </strong>
-                                <div class="o_kanban_record_subtitle">
-                                    <field name="partner_id"/>
-                                </div>
-                                <div>
-                                    <field name="feedback_type" widget="badge" decoration-success="feedback_type == 'compliment'" decoration-warning="feedback_type == 'complaint'" decoration-info="feedback_type == 'suggestion'" decoration-primary="feedback_type == 'question'" decoration-secondary="feedback_type == 'other'"/>
-                                </div>
-                                <div class="o_kanban_record_bottom">
-                                    <div class="oe_kanban_bottom_left">
-                                        <field name="feedback_date" widget="date"/>
-                                    </div>
-                                    <div class="oe_kanban_bottom_right">
-                                        <field name="user_id" widget="many2one_avatar_user"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </t>
-                </templates>
-            </kanban>
         </field>
     </record>
 </odoo>

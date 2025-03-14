@@ -19,6 +19,8 @@
         'views/patient_feedback_views.xml',
         'views/complaint_views.xml',
         'views/menu_views.xml',
+        'view/feedback_dashboard_view.xml',
+        'view/feedback_statistics_view.xml',
         'data/sequence.xml',
     ],
     'demo': [],

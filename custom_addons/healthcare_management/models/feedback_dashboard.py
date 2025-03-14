@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 
+
 class FeedbackDashboard(models.Model):
     _name = 'healthcare.feedback.dashboard'
     _description = 'Bảng điều khiển phản hồi bệnh nhân'

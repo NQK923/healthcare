@@ -20,4 +20,24 @@
               parent="menu_healthcare_customer_care_root"
               action="action_patient_complaint"
               sequence="20"/>
+
+    <!-- Analytics Menu -->
+    <menuitem id="menu_healthcare_analytics"
+              name="Phân tích dữ liệu"
+              parent="menu_healthcare_customer_care_root"
+              sequence="30"/>
+
+    <!-- Feedback Statistics Menu -->
+    <menuitem id="menu_healthcare_feedback_statistics"
+              name="Thống kê phản hồi"
+              parent="menu_healthcare_analytics"
+              action="action_feedback_statistics"
+              sequence="10"/>
+
+    <!-- Feedback Dashboard Menu -->
+    <menuitem id="menu_healthcare_feedback_dashboard"
+              name="Bảng điều khiển phản hồi"
+              parent="menu_healthcare_analytics"
+              action="action_feedback_dashboard"
+              sequence="20"/>
 </odoo>

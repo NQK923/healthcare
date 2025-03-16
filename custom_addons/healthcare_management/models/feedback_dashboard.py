@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 
-
 class FeedbackDashboard(models.Model):
     _name = 'healthcare.feedback.dashboard'
     _description = 'Bảng điều khiển phản hồi bệnh nhân'
@@ -47,15 +46,25 @@ class FeedbackDashboard(models.Model):
                 groupby=['feedback_type']
             )
 
-            record.total_feedback = sum(item['__count'] for item in feedback_data)
+            # Xác định khóa đếm trong kết quả read_group
+            count_key = 'feedback_type_count'
+            if feedback_data:
+                # Tìm khóa đếm phù hợp trong kết quả
+                possible_count_keys = ['__count', 'feedback_type_count']
+                for key in possible_count_keys:
+                    if key in feedback_data[0]:
+                        count_key = key
+                        break
+
+            record.total_feedback = sum(item.get(count_key, 0) for item in feedback_data)
             record.total_compliments = sum(
-                item['__count'] for item in feedback_data if item['feedback_type'] == 'compliment')
+                item.get(count_key, 0) for item in feedback_data if item['feedback_type'] == 'compliment')
             record.total_complaints = sum(
-                item['__count'] for item in feedback_data if item['feedback_type'] == 'complaint')
+                item.get(count_key, 0) for item in feedback_data if item['feedback_type'] == 'complaint')
             record.total_suggestions = sum(
-                item['__count'] for item in feedback_data if item['feedback_type'] == 'suggestion')
+                item.get(count_key, 0) for item in feedback_data if item['feedback_type'] == 'suggestion')
             record.total_questions = sum(
-                item['__count'] for item in feedback_data if item['feedback_type'] == 'question')
+                item.get(count_key, 0) for item in feedback_data if item['feedback_type'] == 'question')
 
             # Tính điểm hài lòng trung bình
             satisfaction_data = self.env['healthcare.feedback.statistics'].search(
@@ -86,6 +95,16 @@ class FeedbackDashboard(models.Model):
                 groupby=['department_id', 'feedback_type']
             )
 
+            # Xác định khóa đếm trong kết quả read_group
+            count_key = 'feedback_type_count'
+            if department_data:
+                # Tìm khóa đếm phù hợp trong kết quả
+                possible_count_keys = ['__count', 'feedback_type_count']
+                for key in possible_count_keys:
+                    if key in department_data[0]:
+                        count_key = key
+                        break
+
             department_stats = defaultdict(lambda: {
                 'department_id': False,
                 'total': 0,
@@ -103,7 +122,7 @@ class FeedbackDashboard(models.Model):
                 if not dept_id:
                     continue
 
-                count = data['__count']
+                count = data.get(count_key, 0)
                 feedback_type = data['feedback_type']
                 department_stats[dept_id]['department_id'] = dept_id
                 department_stats[dept_id]['total'] += count
@@ -168,13 +187,22 @@ class FeedbackDashboard(models.Model):
                 groupby=['feedback_type']
             )
 
+            # Xác định khóa đếm trong kết quả read_group cho feedback_type_data
+            count_key_type = 'feedback_type_count'
+            if feedback_type_data:
+                possible_count_keys = ['__count', 'feedback_type_count']
+                for key in possible_count_keys:
+                    if key in feedback_type_data[0]:
+                        count_key_type = key
+                        break
+
             feedback_type_chart = []
             for data in feedback_type_data:
                 type_name = dict(self.env['healthcare.feedback.statistics']._fields['feedback_type'].selection).get(
                     data['feedback_type'], 'Khác')
                 feedback_type_chart.append({
                     'type': type_name,
-                    'count': data['__count']
+                    'count': data.get(count_key_type, 0)
                 })
 
             record.feedback_by_type_data = json.dumps(feedback_type_chart)
@@ -182,10 +210,19 @@ class FeedbackDashboard(models.Model):
             # Dữ liệu theo tháng
             feedback_month_data = self.env['healthcare.feedback.statistics'].read_group(
                 domain,
-                fields=['month', 'year', 'feedback_type'],
-                groupby=['year', 'month', 'feedback_type'],
-                orderby='year, month'
+                fields=['feedback_type'],
+                groupby=['feedback_date:month', 'feedback_type'],
+                orderby='feedback_date asc'
             )
+
+            # Xác định khóa đếm trong kết quả read_group cho feedback_month_data
+            count_key_month = 'feedback_type_count'
+            if feedback_month_data:
+                possible_count_keys = ['__count', 'feedback_type_count']
+                for key in possible_count_keys:
+                    if key in feedback_month_data[0]:
+                        count_key_month = key
+                        break
 
             month_data = defaultdict(lambda: {
                 'month_name': '',
@@ -209,19 +246,19 @@ class FeedbackDashboard(models.Model):
                 if year and month:
                     month_key = f"{year}-{month}"
                     month_data[month_key]['month_name'] = f"{month_names.get(month, month)}/{year}"
-                    month_data[month_key]['total'] += data['__count']
+                    month_data[month_key]['total'] += data.get(count_key_month, 0)
 
                     feedback_type = data['feedback_type']
                     if feedback_type == 'compliment':
-                        month_data[month_key]['compliments'] += data['__count']
+                        month_data[month_key]['compliments'] += data.get(count_key_month, 0)
                     elif feedback_type == 'complaint':
-                        month_data[month_key]['complaints'] += data['__count']
+                        month_data[month_key]['complaints'] += data.get(count_key_month, 0)
                     elif feedback_type == 'suggestion':
-                        month_data[month_key]['suggestions'] += data['__count']
+                        month_data[month_key]['suggestions'] += data.get(count_key_month, 0)
                     elif feedback_type == 'question':
-                        month_data[month_key]['questions'] += data['__count']
+                        month_data[month_key]['questions'] += data.get(count_key_month, 0)
                     elif feedback_type == 'other':
-                        month_data[month_key]['other'] += data['__count']
+                        month_data[month_key]['other'] += data.get(count_key_month, 0)
 
             # Sắp xếp theo tháng
             sorted_months = sorted(month_data.items(), key=lambda x: x[0])
@@ -236,6 +273,15 @@ class FeedbackDashboard(models.Model):
                 groupby=['satisfaction_rating']
             )
 
+            # Xác định khóa đếm trong kết quả read_group cho satisfaction_data
+            count_key_satisfaction = 'satisfaction_rating_count'
+            if satisfaction_data:
+                possible_count_keys = ['__count', 'satisfaction_rating_count']
+                for key in possible_count_keys:
+                    if key in satisfaction_data[0]:
+                        count_key_satisfaction = key
+                        break
+
             satisfaction_chart = []
             satisfaction_labels = {
                 '1': 'Rất không hài lòng',
@@ -249,7 +295,7 @@ class FeedbackDashboard(models.Model):
                 rating = data['satisfaction_rating']
                 satisfaction_chart.append({
                     'rating': satisfaction_labels.get(rating, rating),
-                    'count': data['__count']
+                    'count': data.get(count_key_satisfaction, 0)
                 })
 
             record.satisfaction_distribution_data = json.dumps(satisfaction_chart)

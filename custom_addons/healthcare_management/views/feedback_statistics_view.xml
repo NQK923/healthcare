@@ -58,11 +58,11 @@
                 <field name="feedback_date"/>
                 <field name="feedback_type"/>
                 <field name="state"/>
-                <filter string="Ngày hiện tại" name="today" domain="[('feedback_date','=',context_today().strftime('%Y-%m-%d'))]"/>
-                <filter string="Tuần này" name="this_week" domain="[('feedback_date','&gt;=',(context_today()+relativedelta(weeks=-1,days=1,weekday=0)).strftime('%Y-%m-%d')),('feedback_date','&lt;=',(context_today()+relativedelta(weekday=6)).strftime('%Y-%m-%d'))]"/>
-                <filter string="Tháng này" name="this_month" domain="[('feedback_date','&gt;=',(context_today().replace(day=1)).strftime('%Y-%m-%d')),('feedback_date','&lt;',(context_today()+relativedelta(months=1,day=1)).strftime('%Y-%m-%d'))]"/>
-                <filter string="Quý này" name="this_quarter" domain="[('feedback_date','&gt;=',(context_today()+relativedelta(months=-context_today().month%3,day=1)).strftime('%Y-%m-%d')),('feedback_date','&lt;',(context_today()+relativedelta(months=-context_today().month%3+3,day=1)).strftime('%Y-%m-%d'))]"/>
-                <filter string="Năm nay" name="this_year" domain="[('feedback_date','&gt;=',(context_today().replace(month=1,day=1)).strftime('%Y-%m-%d')),('feedback_date','&lt;',(context_today().replace(month=1,day=1,year=context_today().year+1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Ngày hiện tại" name="today" date="feedback_date" domain="[]"/>
+                <filter string="Tuần này" name="this_week" date="feedback_date" domain="[]"/>
+                <filter string="Tháng này" name="this_month" date="feedback_date" domain="[]"/>
+                <filter string="Quý này" name="this_quarter" date="feedback_date" domain="[]"/>
+                <filter string="Năm nay" name="this_year" date="feedback_date" domain="[]"/>
                 <separator/>
                 <filter string="Có khiếu nại" name="has_complaint" domain="[('has_complaint','=',True)]"/>
                 <group expand="0" string="Group By">

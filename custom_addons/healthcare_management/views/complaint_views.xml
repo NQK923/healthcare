@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- views/complaint_views.xml -->
 <odoo>
-    <!-- Form View for Patient Complaint -->
+
     <record id="view_patient_complaint_form" model="ir.ui.view">
         <field name="name">healthcare.patient.complaint.form</field>
         <field name="model">healthcare.patient.complaint</field>
@@ -61,7 +60,6 @@
         </field>
     </record>
 
-    <!-- Tree View for Patient Complaint -->
     <record id="view_patient_complaint_tree" model="ir.ui.view">
         <field name="name">healthcare.patient.complaint.tree</field>
         <field name="model">healthcare.patient.complaint</field>
@@ -80,7 +78,6 @@
         </field>
     </record>
 
-    <!-- Search View for Patient Complaint -->
     <record id="view_patient_complaint_search" model="ir.ui.view">
         <field name="name">healthcare.patient.complaint.search</field>
         <field name="model">healthcare.patient.complaint</field>
@@ -111,7 +108,6 @@
         </field>
     </record>
 
-    <!-- Action for Patient Complaint -->
     <record id="action_patient_complaint" model="ir.actions.act_window">
         <field name="name">Khiếu nại của bệnh nhân</field>
         <field name="res_model">healthcare.patient.complaint</field>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- views/patient_feedback_views.xml -->
 <odoo>
-    <!-- Form View for Patient Feedback -->
+
     <record id="view_patient_feedback_form" model="ir.ui.view">
         <field name="name">healthcare.patient.feedback.form</field>
         <field name="model">healthcare.patient.feedback</field>
@@ -48,7 +47,6 @@
         </field>
     </record>
 
-    <!-- Tree View for Patient Feedback -->
     <record id="view_patient_feedback_tree" model="ir.ui.view">
         <field name="name">healthcare.patient.feedback.tree</field>
         <field name="model">healthcare.patient.feedback</field>
@@ -65,7 +63,6 @@
         </field>
     </record>
 
-    <!-- Search View for Patient Feedback -->
     <record id="view_patient_feedback_search" model="ir.ui.view">
         <field name="name">healthcare.patient.feedback.search</field>
         <field name="model">healthcare.patient.feedback</field>
@@ -94,7 +91,6 @@
         </field>
     </record>
 
-    <!-- Action for Patient Feedback -->
     <record id="action_patient_feedback" model="ir.actions.act_window">
         <field name="name">Phản hồi của bệnh nhân</field>
         <field name="res_model">healthcare.patient.feedback</field>

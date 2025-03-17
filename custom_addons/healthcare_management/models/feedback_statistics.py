@@ -35,10 +35,9 @@ class FeedbackStatistics(models.Model):
     ], string='Đánh giá mức độ hài lòng')
     has_complaint = fields.Boolean(string='Có khiếu nại liên quan')
 
-    # Trường tính toán để hỗ trợ phân tích
     month = fields.Char(string='Tháng', readonly=True)
     year = fields.Char(string='Năm', readonly=True)
-    satisfaction_numeric = fields.Integer(string='Điểm hài lòng', readonly=True)
+    satisfaction_numeric = fields.Integer(string='Tổng đánh giá', readonly=True)
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)

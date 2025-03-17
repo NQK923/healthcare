@@ -33,19 +33,6 @@
         </field>
     </record>
 
-    <!-- Pivot View for Feedback Statistics -->
-    <record id="view_feedback_statistics_pivot" model="ir.ui.view">
-        <field name="name">healthcare.feedback.statistics.pivot</field>
-        <field name="model">healthcare.feedback.statistics</field>
-        <field name="arch" type="xml">
-            <pivot string="Phân tích phản hồi" sample="1" display_quantity="true">
-                <field name="feedback_date" type="row" interval="month"/>
-                <field name="feedback_type" type="col"/>
-                <field name="satisfaction_numeric" type="measure"/>
-            </pivot>
-        </field>
-    </record>
-
     <!-- Search View for Feedback Statistics -->
     <record id="view_feedback_statistics_search" model="ir.ui.view">
         <field name="name">healthcare.feedback.statistics.search</field>
@@ -82,7 +69,7 @@
     <record id="action_feedback_statistics" model="ir.actions.act_window">
         <field name="name">Thống kê phản hồi</field>
         <field name="res_model">healthcare.feedback.statistics</field>
-        <field name="view_mode">pivot,graph,list</field>
+        <field name="view_mode">graph,list</field>
         <field name="search_view_id" ref="view_feedback_statistics_search"/>
         <field name="context">{'search_default_this_month': 1}</field>
         <field name="help" type="html">
